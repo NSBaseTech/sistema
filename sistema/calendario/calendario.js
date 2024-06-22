@@ -68,10 +68,10 @@ function generateNewList() {
   `, '')
 }
 
-function buildMinutes(hora){
+function buildMinutes(hora) {
     var minutosMontados = ''
-   
-    for(let minute = 10; minute < 60; minute += 10) {
+
+    for (let minute = 10; minute < 60; minute += 10) {
         minutosMontados += `
         <li data-message="${String(hora).padStart(2, '0')}:${String(minute).padStart(2, '0')}" style="--cardColor:rgb(18, 211, 195)">
           <div class="content" id="status-${String(hora).padStart(2, '0')}:${String(minute).padStart(2, '0')}">
@@ -81,8 +81,8 @@ function buildMinutes(hora){
           </div>
         </li>
       `
-      }
-      return minutosMontados;
+    }
+    return minutosMontados;
 }
 
 
@@ -107,21 +107,21 @@ async function carregarLista(force) {
 
 
     data.forEach(arg => {
-        const contentId = `agendamento-${arg.Horario_da_consulta}`; 
+        const contentId = `agendamento-${arg.Horario_da_consulta}`;
 
         const contentEl = document.getElementById(contentId);
-   
+
 
         if (contentEl) {
 
             contentEl.innerHTML = `${todosPacientes.find(pac => arg.Nome === pac.id)?.Nome} - Especialista: ${arg.Especialista}  ${arg.observacao}`
-            
+
             contentEl.style = 'cursor: pointer; user-select: none;'
 
             const lis = document.querySelectorAll("#olcards li");
             const startIndex = getIndexByDataMessage(`${arg.Horario_da_consulta}`);
             const endIndex = getIndexByDataMessage(`${arg.Horario_de_Termino_da_consulta}`);
-                       
+
             console.log(`Horário da consulta: ${arg.Horario_da_consulta}`);
             console.log(`Horário de término da consulta: ${arg.Horario_de_Termino_da_consulta}`);
             console.log(`Índice de início: ${startIndex}`);
@@ -129,9 +129,20 @@ async function carregarLista(force) {
 
             for (let i = startIndex; i <= endIndex && i < lis.length; i++) {
                 let element = lis[i].firstElementChild;
-                element.style = 'background-color: rgb(68, 71, 92);';
+                element.style = 'background-color: rgb(205, 205, 205);';
+    
+                // Adicionando mensagem de Horários Agendados apenas nos elementos cinza, exceto o horário de início
+                if (i !== startIndex) {
+                    const atendimentoMessage = document.createElement('div');
+                    atendimentoMessage.innerText = 'Horário Ocupado';
+                    atendimentoMessage.style = 'font-weight: bold; text-align: right;';
+                    element.appendChild(atendimentoMessage);
+                }
+    
+                // Adicionar borda ao elemento li
+              
             }
-            
+
             contentEl.onclick = () => {
                 pacientesFiltrados = todosPacientes.filter(({ Especialista }) => Especialista === list.value)
 
@@ -419,7 +430,7 @@ document.getElementById('agendamento').addEventListener('click', () => {
 });
 
 document.getElementById('btn-close').addEventListener('click', () => {
-    
+
     modAgen.close()
 })
 
@@ -709,7 +720,7 @@ const getConsultasBD = async (valuePacienteFiltrado) => {
 }
 
 function loadConsultas(event) {
-    
+
     event.preventDefault()
     let pacienteFiltrado = document.getElementById("age_name_cancelado");
     let valuePacienteFiltrado = pacienteFiltrado.value;
@@ -725,7 +736,7 @@ function loadConsultas(event) {
 
 
 function insertItemCancelado(item, index) {
-    
+
     let tr = document.createElement("tr");
     const moment = new Date(item.Data_do_Atendimento)
     const dia = moment.getDate() + 1

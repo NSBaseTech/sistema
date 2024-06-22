@@ -402,7 +402,11 @@ li::before {
   position: relative;
   width: 100%;
   font-size: 1.25em;
+  
 }
+
+
+
 
 .olcards li .content::before {
   content: "";
