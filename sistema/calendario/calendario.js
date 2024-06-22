@@ -70,6 +70,7 @@ function generateNewList() {
 
 function buildMinutes(hora){
     var minutosMontados = ''
+   
     for(let minute = 10; minute < 60; minute += 10) {
         minutosMontados += `
         <li data-message="${String(hora).padStart(2, '0')}:${String(minute).padStart(2, '0')}" style="--cardColor:rgb(18, 211, 195)">
@@ -107,6 +108,7 @@ async function carregarLista(force) {
 
     data.forEach(arg => {
         const contentId = `agendamento-${arg.Horario_da_consulta}`; 
+
         const contentEl = document.getElementById(contentId);
    
 
@@ -117,11 +119,17 @@ async function carregarLista(force) {
             contentEl.style = 'cursor: pointer; user-select: none;'
 
             const lis = document.querySelectorAll("#olcards li");
-            const index = getIndexByDataMessage(`${arg.Horario_da_consulta}`);
-            const endIndex = index + 6; 
-            for (let i = index; i < endIndex && i < lis.length; i++) {
+            const startIndex = getIndexByDataMessage(`${arg.Horario_da_consulta}`);
+            const endIndex = getIndexByDataMessage(`${arg.Horario_de_Termino_da_consulta}`);
+                       
+            console.log(`Horário da consulta: ${arg.Horario_da_consulta}`);
+            console.log(`Horário de término da consulta: ${arg.Horario_de_Termino_da_consulta}`);
+            console.log(`Índice de início: ${startIndex}`);
+            console.log(`Índice de término: ${endIndex}`);
+
+            for (let i = startIndex; i <= endIndex && i < lis.length; i++) {
                 let element = lis[i].firstElementChild;
-                element.style = 'background-color: rgb(68, 71, 92);'
+                element.style = 'background-color: rgb(68, 71, 92);';
             }
             
             contentEl.onclick = () => {
@@ -143,6 +151,7 @@ async function carregarLista(force) {
                 list.value = arg.Especialista
                 data_atendimentoinp.value = arg.Data_do_Atendimento
                 horario_consultainp.value = arg.Horario_da_consulta
+                horariot_consultainp.value = arg.Horario_de_Termino_da_consulta
                 valor_consultainpinp.value = arg.Valor_da_Consulta
                 status_consultainp.value = arg.Status_da_Consulta
                 status_pagamentoinp.value = arg.Status_do_pagamento
@@ -400,6 +409,7 @@ document.getElementById('agendamento').addEventListener('click', () => {
     phoneinp.value = ""
     data_atendimentoinp.value = ""
     horario_consultainp.value = ""
+    horariot_consultainp.value = ""
     valor_consultainpinp.value = ""
     status_consultainp.value = ""
     status_pagamentoinp.value = ""
@@ -422,6 +432,7 @@ const nameinp = document.getElementById("age_name") //O getElementById tem que s
 const phoneinp = document.getElementById("phone")
 const data_atendimentoinp = document.getElementById("data_atendimento")
 const horario_consultainp = document.getElementById("horario_consulta")
+const horariot_consultainp = document.getElementById("horariot_consulta")
 const valor_consultainpinp = document.getElementById("valor_consulta")
 const status_consultainp = document.getElementById("status_c")
 const status_pagamentoinp = document.getElementById("status_pagamento")
@@ -500,6 +511,7 @@ function agendamento(event) {
                         Especialista: list.value,
                         Data_do_Atendimento: datasFuturasProgramadas[index].toISOString().split('T')[0],
                         Horario_da_consulta: horario_consultainp.value,
+                        Horario_de_Termino_da_consulta: horariot_consultainp.value,
                         Valor_da_Consulta: Number(valor_consultainpinp.value),
                         Status_da_Consulta: status_consultainp.value,
                         Status_do_pagamento: status_pagamentoinp.value,
@@ -525,6 +537,7 @@ function agendamento(event) {
                 Especialista: list.value,
                 Data_do_Atendimento: data_atendimentoinp.value,
                 Horario_da_consulta: horario_consultainp.value,
+                Horario_de_Termino_da_consulta: horariot_consultainp.value,
                 Valor_da_Consulta: Number(valor_consultainpinp.value),
                 Status_da_Consulta: status_consultainp.value,
                 Status_do_pagamento: status_pagamentoinp.value,
@@ -541,6 +554,7 @@ function agendamento(event) {
             phoneinp.value = ""
             data_atendimentoinp.value = ""
             horario_consultainp.value = ""
+            horariot_consultainp.value = ""
             valor_consultainpinp.value = ""
             status_consultainp.value = ""
             status_pagamentoinp.value = ""
@@ -558,6 +572,7 @@ function agendamento(event) {
                 Especialista: list.value,
                 Data_do_Atendimento: data_atendimentoinp.value,
                 Horario_da_consulta: horario_consultainp.value,
+                Horario_de_Termino_da_consulta: horariot_consultainp.value,
                 Valor_da_Consulta: Number(valor_consultainpinp.value),
                 Status_da_Consulta: status_consultainp.value,
                 Status_do_pagamento: status_pagamentoinp.value,
@@ -722,6 +737,7 @@ function insertItemCancelado(item, index) {
       <td id="${item.id}">${item.Nome}</td>
       <td>${dia}/${mes}/${ano}</td>
       <td>${item.Horario_da_consulta}</td>
+      <td>${item.Horario_de_Termino_da_consulta}</td>
       <td>${item.Status_da_Consulta}</td>
       <td>${item.Status_do_pagamento}</td>
     `;
