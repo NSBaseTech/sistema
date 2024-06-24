@@ -121,12 +121,7 @@ async function carregarLista(force) {
             const lis = document.querySelectorAll("#olcards li");
             const startIndex = getIndexByDataMessage(`${arg.Horario_da_consulta}`);
             const endIndex = getIndexByDataMessage(`${arg.Horario_de_Termino_da_consulta}`);
-
-            console.log(`Horário da consulta: ${arg.Horario_da_consulta}`);
-            console.log(`Horário de término da consulta: ${arg.Horario_de_Termino_da_consulta}`);
-            console.log(`Índice de início: ${startIndex}`);
-            console.log(`Índice de término: ${endIndex}`);
-
+           
             for (let i = startIndex; i <= endIndex && i < lis.length; i++) {
                 let element = lis[i].firstElementChild;
                 element.style = 'background-color: rgb(205, 205, 205);';
