@@ -498,102 +498,133 @@ function converterDataFormatoBrasileiroParaISO(data) {
 }
 
 function agendamento(event) {
-    event.preventDefault()
+    event.preventDefault();
 
-    const { agendamentoId } = document.getElementById("formagendamento").dataset
+    const form = document.getElementById("formagendamento");
+    const { agendamentoId } = form.dataset;
+
+    const inputs = {
+        nome: nameinp.value,
+        telefone: phoneinp.value,
+        especialista: list.value,
+        dataAtendimento: data_atendimentoinp.value,
+        horarioConsulta: horario_consultainp.value,
+        horarioTerminoConsulta: horariot_consultainp.value,
+        valorConsulta: Number(valor_consultainpinp.value),
+        statusConsulta: status_consultainp.value,
+        statusPagamento: status_pagamentoinp.value,
+        observacao: observacaoinp.value
+    };
+
+    const clearInputs = () => {
+        nameinp.value = "";
+        phoneinp.value = "";
+        data_atendimentoinp.value = "";
+        horario_consultainp.value = "";
+        horariot_consultainp.value = "";
+        valor_consultainpinp.value = "";
+        status_consultainp.value = "";
+        status_pagamentoinp.value = "";
+        observacaoinp.value = "";
+    };
+
+    const createAppointment = (data) => {
+        fetch("/agendamento", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert("Paciente Agendado com sucesso!");
+            clearInputs();
+            carregarLista(true).catch(console.error);
+        })
+        .catch(() => alert("Erro ao Agendar"));
+    };
+
+    const updateAppointment = (data) => {
+        fetch("/agendamento", {
+            method: "PUT",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert("Paciente Atualizado com sucesso!");
+            carregarLista(true).catch(console.error);
+        })
+        .catch(() => alert("Erro ao atualizar"));
+    };
+    const checkForConflicts = (data, callback) => {
+        fetch(`/agendamentos?data=${data.Data_do_Atendimento}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar agendamentos.');
+                }
+                return response.json();
+            })
+            .then(existingAppointments => {
+                const conflict = existingAppointments.some(appt => {
+                    // Verifica se a data é a mesma
+                    if (appt.Data_do_Atendimento !== data.Data_do_Atendimento) {
+                        return false;
+                    }
+                    // Verifica se há sobreposição considerando todos os casos possíveis
+                    return !(appt.Horario_de_Termino_da_consulta <= data.Horario_da_consulta || 
+                             appt.Horario_da_consulta >= data.Horario_de_Termino_da_consulta);
+                });
+    
+                if (conflict) {
+                    alert("Horário já está ocupado. Escolha outro horário.");
+                } else {
+                    callback(data); // Chama a função callback para agendar
+                }
+    
+                console.log(conflict)   
+            })
+            .catch(error => {
+                console.error('Erro ao verificar conflitos:', error);
+                // Trate o erro de forma apropriada, como exibir uma mensagem ao usuário
+                alert('Ocorreu um erro ao verificar conflitos. Tente novamente mais tarde.');
+            });
+    };
+    
+
+    const appointmentData = {
+        Nome: inputs.nome,
+        Telefone: inputs.telefone,
+        Especialista: inputs.especialista,
+        Data_do_Atendimento: inputs.dataAtendimento,
+        Horario_da_consulta: inputs.horarioConsulta,
+        Horario_de_Termino_da_consulta: inputs.horarioTerminoConsulta,
+        Valor_da_Consulta: inputs.valorConsulta,
+        Status_da_Consulta: inputs.statusConsulta,
+        Status_do_pagamento: inputs.statusPagamento,
+        observacao: inputs.observacao
+    };
 
     if (agendamentoId === '0') {
-
-        let datasFuturasProgramadas = calculadata();
+        const datasFuturasProgramadas = calculadata();
 
         if (datasFuturasProgramadas.length > 0) {
-
-            for (let index = 0; index < datasFuturasProgramadas.length; index++) {
-                fetch("/agendamento", {
-                    method: "POST", body: JSON.stringify({
-
-                        Nome: nameinp.value, // A escrita antes do : tem que ta igual ao campo que foi criado no prisma
-                        Telefone: phoneinp.value,
-                        Especialista: list.value,
-                        Data_do_Atendimento: datasFuturasProgramadas[index].toISOString().split('T')[0],
-                        Horario_da_consulta: horario_consultainp.value,
-                        Horario_de_Termino_da_consulta: horariot_consultainp.value,
-                        Valor_da_Consulta: Number(valor_consultainpinp.value),
-                        Status_da_Consulta: status_consultainp.value,
-                        Status_do_pagamento: status_pagamentoinp.value,
-                        observacao: observacaoinp.value,
-
-                    }),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }).then(response => response.json()).then(data => {
-                    console.log("Agendamento Futuro Agendado com sucesso!")
-                }).catch(() => alert("Erro ao Agendar"))
-            }
-
-
+            datasFuturasProgramadas.forEach(data => {
+                const futureAppointmentData = {
+                    ...appointmentData,
+                    Data_do_Atendimento: data.toISOString().split('T')[0]
+                };
+                checkForConflicts(futureAppointmentData, createAppointment);
+            });
         }
 
-        fetch("/agendamento", {
-            method: "POST", body: JSON.stringify({
-
-                Nome: nameinp.value, // A escrita antes do : tem que ta igual ao campo que foi criado no prisma
-                Telefone: phoneinp.value,
-                Especialista: list.value,
-                Data_do_Atendimento: data_atendimentoinp.value,
-                Horario_da_consulta: horario_consultainp.value,
-                Horario_de_Termino_da_consulta: horariot_consultainp.value,
-                Valor_da_Consulta: Number(valor_consultainpinp.value),
-                Status_da_Consulta: status_consultainp.value,
-                Status_do_pagamento: status_pagamentoinp.value,
-                observacao: observacaoinp.value,
-
-            }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(response => response.json()).then(data => {
-            alert("Paciente Agendado com sucesso!")
-
-            nameinp.value = "" // A escrita antes do : tem que ta igual ao campo que foi criado no prisma
-            phoneinp.value = ""
-            data_atendimentoinp.value = ""
-            horario_consultainp.value = ""
-            horariot_consultainp.value = ""
-            valor_consultainpinp.value = ""
-            status_consultainp.value = ""
-            status_pagamentoinp.value = ""
-            observacaoinp.value = ""
-
-            carregarLista(true).catch(console.error)
-        }).catch(() => alert("Erro ao Agendar"))
+        checkForConflicts(appointmentData, createAppointment);
     } else {
-
-        fetch("/agendamento", {
-            method: "PUT", body: JSON.stringify({
-                id: agendamentoId,
-                Nome: nameinp.value,
-                Telefone: phoneinp.value,
-                Especialista: list.value,
-                Data_do_Atendimento: data_atendimentoinp.value,
-                Horario_da_consulta: horario_consultainp.value,
-                Horario_de_Termino_da_consulta: horariot_consultainp.value,
-                Valor_da_Consulta: Number(valor_consultainpinp.value),
-                Status_da_Consulta: status_consultainp.value,
-                Status_do_pagamento: status_pagamentoinp.value,
-                observacao: observacaoinp.value,
-
-            }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(response => response.json()).then(data => {
-            alert("Paciente Atualizado com sucesso!")
-            carregarLista(true).catch(console.error)
-        }).catch(() => {
-            alert("Erro ao atualizar")
-        })
+        const updatedData = { id: agendamentoId, ...appointmentData };
+        updateAppointment(updatedData);
     }
 
     //ESPERA
