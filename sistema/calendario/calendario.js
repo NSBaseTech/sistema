@@ -560,7 +560,8 @@ function agendamento(event) {
         })
         .catch(() => alert("Erro ao atualizar"));
     };
-    const checkForConflicts = (data, callback) => {
+
+    const checkForConflicts = (data, callback, agendamentoId = null) => {
         fetch(`/agendamentos?data=${data.Data_do_Atendimento}`)
             .then(response => {
                 if (!response.ok) {
@@ -570,6 +571,10 @@ function agendamento(event) {
             })
             .then(existingAppointments => {
                 const conflict = existingAppointments.some(appt => {
+                    // Ignora o próprio agendamento ao verificar conflitos
+                    if (agendamentoId && appt.id === agendamentoId) {
+                        return false;
+                    }
                     // Verifica se a data é a mesma
                     if (appt.Data_do_Atendimento !== data.Data_do_Atendimento) {
                         return false;
@@ -578,13 +583,13 @@ function agendamento(event) {
                     return !(appt.Horario_de_Termino_da_consulta <= data.Horario_da_consulta || 
                              appt.Horario_da_consulta >= data.Horario_de_Termino_da_consulta);
                 });
-    
+
                 if (conflict) {
                     alert("Horário já está ocupado. Escolha outro horário.");
                 } else {
                     callback(data); // Chama a função callback para agendar
                 }
-    
+
                 console.log(conflict)   
             })
             .catch(error => {
@@ -593,7 +598,6 @@ function agendamento(event) {
                 alert('Ocorreu um erro ao verificar conflitos. Tente novamente mais tarde.');
             });
     };
-    
 
     const appointmentData = {
         Nome: inputs.nome,
@@ -624,8 +628,10 @@ function agendamento(event) {
         checkForConflicts(appointmentData, createAppointment);
     } else {
         const updatedData = { id: agendamentoId, ...appointmentData };
-        updateAppointment(updatedData);
+        checkForConflicts(updatedData, updateAppointment, agendamentoId);
     }
+
+
 
     //ESPERA
     function cadastro_espera(event) {
