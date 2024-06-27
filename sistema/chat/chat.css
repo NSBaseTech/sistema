@@ -48,6 +48,7 @@ body {
 }
 
 .profile {
+    width:auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -272,3 +273,18 @@ body {
     border-radius: 10px;
    
 }
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+iframe{
+    left:68%;
+    
+}
+.chat-popup{
+    width:auto
+}
+
+}
+
+
+
+   
