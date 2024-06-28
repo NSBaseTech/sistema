@@ -364,47 +364,53 @@ a {
     display: none;
   }
 
-  .switch {
-    display: none;
+ 
+  .switch-container {
+    display: block;
+    z-index:1000;
+    height: 93%;
+    width:20%;
+    
+    
   }
 
-  .switch-container {
-    display: none;
+  .escrita{
+    font-size: 8px;
+    margin-bottom: 15%;
+    top: 20%;
+  }
+
+  .contato{
+    font-size: 8px;
+    margin:0;
+    margin-left:5%;
+    
+  }
+
+  h1{
+    display:none;
   }
 
   .button0,
   .button1,
   .button2,
   .button3 {
-    left: 30%;
-    top: 13%;
+    left: 105px;
+    top: 90px;
     z-index: 2;
     position: absolute;
-    border-radius: 15px;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 0px;
-    cursor: pointer;
-    outline: 0px;
-    padding: 0 2px;
-    font-weight: 600;
-    font-size: 13px;
-    color: white;
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
-
-  }
+     }
 
   .button1 {
-    top: 34.5%;
+    top: 210px;
   }
 
   .button2 {
-    top: 56.5%;
+    top: 323px;
   }
 
   .button3 {
-    top: 78.5%;
+    top: 435px;
   }
 
   .backdrop,
@@ -412,73 +418,50 @@ a {
   .backdrop2,
   .backdrop3 {
     position: absolute;
-    left: 28%;
+    left: 95px;
     z-index: 1;
     width: 150px;
     height: 100px;
-    background: linear-gradient(45deg, rgb(12, 158, 146) 0%, rgb(63, 217, 223) 100%);
-    border-radius: 15px;
-    transition: all ease-in-out 0.5s;
     margin: 0;
     /* Esta transição deve ser aplicada a todos os backdrops */
   }
 
   /* cadastro paciente */
   .backdrop {
-    top: 17%;
+    top: 117.9px;
 
   }
 
   /* agendamento */
   .backdrop1 {
-    top: 38.5%;
+    top: 237px;
 
   }
 
   /* cadastro convenio */
   .backdrop2 {
-    top: 60.5%;
+    top: 53%;
 
   }
 
   /* fluxo de caixa */
   .backdrop3 {
-    top: 82.5%;
+    top: 70%;
+    margin-bottom: 5%;
 
-  }
-
-  .button0:hover+.backdrop,
-  .button1:hover+.backdrop1,
-  .button2:hover+.backdrop2,
-  .button3:hover+.backdrop3 {
-
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
-    transform: rotate(15deg) translateX(5%) translateY(-20%);
-  }
-
-
-  .button0:active,
-  .button0:active+.backdrop,
-  .button1:active,
-  .button1:active+.backdrop1,
-  .button2:active,
-  .button2:active+.backdrop2,
-  .button3:active,
-  .button3:active+.backdrop3 {
-    box-shadow: none;
-  }
+  } 
 
   .barrinha {
-    width: 60%;
+    width: 274px;
     height: 2%;
     left: 25%;
 
   }
 
   .out-button {
-    width: 20%;
-    top: -15%;
-    left: 0%;
+    width: 30%;
+    left:50%;
+    top:87%;
   }
 
   iframe {

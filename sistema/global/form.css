@@ -176,10 +176,11 @@ body {
 
 @media (min-width: 410px) and (max-width: 600px) {
   .container {
-    width: 85%;
+    justify-self: center;
+    width: 348px;
     left:10%;
-    top:15%;
-    height: 80%;
+    top:9%;
+    height: 85%;
     
   }
 }
