@@ -5,6 +5,22 @@
   box-sizing: border-box;
 }
 
+.meuUsuario{
+  flex: 1 1 0; 
+  color: white; 
+  font-size: 16px; 
+  font-family: Nunito; 
+  font-weight: 400; 
+  word-wrap: break-word
+}
+
+.meuUsuario  i{
+  font-size:large; 
+  align-items: center; 
+}
+
+
+
 .barrinha {
   position: relative;
   width: 19%;
@@ -589,9 +605,14 @@ a {
     display: none;
   }
 
-  h1{
-    display:none;
+  .meuUsuario{
+    font-size: 10px;
   }
+
+  .meuUsuario i{
+    font-size: 11px;
+  }
+  
 
   .escrita {
     font-size: 12px;
