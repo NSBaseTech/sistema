@@ -291,35 +291,34 @@ app.post("/Fluxo_de_caixa", async (req, res) => {
 
 app.get("/Fluxo_de_caixa", async (req, res) => {
     try {
-        const fluxos = await prisma.Fluxo_de_caixa.findMany()
+        const fluxos = await prisma.Fluxo_de_caixa.findMany();
 
         // Buscar consultas com Status 'Pago'
         const consultas = await prisma.Agendamento.findMany({
             where: {
                 Status_do_pagamento: 'Pago',
             }
-        })
+        });
 
-        const pacietesCache = {}
+        const pacietesCache = {};
 
         for (const consulta of consultas) {
-            let nome = 'Não encontrado'  // Valor padrão
+            let nome = 'Não encontrado';  // Valor padrão
 
-            // Verifica se 'Nome' está presente em consulta
             if (consulta.Nome) {
                 // Se o paciente não está no cache, busca no banco de dados
                 if (!pacietesCache[consulta.Nome]) {
                     const pac = await prisma.cadastro_pacientes.findUnique({
                         where: { id: consulta.Nome }
-                    })
+                    });
 
                     // Armazenar o resultado no cache (mesmo que seja null)
-                    pacietesCache[consulta.Nome] = pac || null
+                    pacietesCache[consulta.Nome] = pac || null;
                 }
 
                 // Verificar se há um paciente no cache antes de acessar 'Nome'
                 if (pacietesCache[consulta.Nome]) {
-                    nome = pacietesCache[consulta.Nome].Nome ?? 'Não encontrado'
+                    nome = pacietesCache[consulta.Nome]?.Nome ?? 'Não encontrado';
                 }
             }
 
@@ -331,17 +330,16 @@ app.get("/Fluxo_de_caixa", async (req, res) => {
                 Tipo: 'Entrada',
                 Especialista: consulta.Especialista,
                 Data: consulta.Data_do_Atendimento
-            })
+            });
         }
 
         // Retorna a lista completa de fluxos
-        res.json(fluxos)
+        res.json(fluxos);
     } catch (error) {
-        console.error("Erro na rota /Fluxo_de_caixa:", error)
-        res.status(500).json({ error: "Erro no servidor" })
+        console.error("Erro na rota /Fluxo_de_caixa:", error);
+        res.status(500).json({ error: "Erro no servidor" });
     }
-})
-
+});
 
 
 // Rota Editar = app.put
