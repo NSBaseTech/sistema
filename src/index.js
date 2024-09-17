@@ -290,49 +290,58 @@ app.post("/Fluxo_de_caixa", async (req, res) => {
 // Rota Receber = app.get
 
 app.get("/Fluxo_de_caixa", async (req, res) => {
-    const fluxos = await prisma.Fluxo_de_caixa.findMany()
+    try {
+        const fluxos = await prisma.Fluxo_de_caixa.findMany()
 
-    const consultas = await prisma.Agendamento.findMany({
-        where: {
-            Status_do_pagamento: 'Pago',
-        }
-    })
-
-    const pacietesCache = {}
-
-    for (const consulta of consultas) {
-        let nome = 'Não encontrado' // Valor padrão
-
-        if (!pacietesCache[consulta.Nome]) {
-            const pac = await prisma.cadastro_pacientes.findUnique({
-                where: { id: consulta.Nome }
-            })
-
-            // Verificar se o paciente foi encontrado
-            if (pac) {
-                pacietesCache[consulta.Nome] = pac
-            } else {
-                pacietesCache[consulta.Nome] = null // Evitar repetir consultas ao banco
+        // Buscar consultas com Status 'Pago'
+        const consultas = await prisma.Agendamento.findMany({
+            where: {
+                Status_do_pagamento: 'Pago',
             }
-        }
-
-        // Verificar se há paciente no cache
-        if (pacietesCache[consulta.Nome]) {
-            nome = pacietesCache[consulta.Nome].Nome ?? 'Não encontrado'
-        }
-
-        fluxos.push({
-            id: `con-${consulta.id}`,
-            Descricao: `Atendimento: ${nome}`,
-            Valor: String(consulta.Valor_da_Consulta),
-            Tipo: 'Entrada',
-            Especialista: consulta.Especialista,
-            Data: consulta.Data_do_Atendimento
         })
-    }
 
-    res.json(fluxos)
+        const pacietesCache = {}
+
+        for (const consulta of consultas) {
+            let nome = 'Não encontrado'  // Valor padrão
+
+            // Verifica se 'Nome' está presente em consulta
+            if (consulta.Nome) {
+                // Se o paciente não está no cache, busca no banco de dados
+                if (!pacietesCache[consulta.Nome]) {
+                    const pac = await prisma.cadastro_pacientes.findUnique({
+                        where: { id: consulta.Nome }
+                    })
+
+                    // Se encontrou o paciente, coloca no cache, senão armazena null
+                    pacietesCache[consulta.Nome] = pac || null
+                }
+
+                // Se o paciente existe no cache, define o nome
+                if (pacietesCache[consulta.Nome]) {
+                    nome = pacietesCache[consulta.Nome].Nome ?? 'Não encontrado'
+                }
+            }
+
+            // Adiciona o fluxo relacionado à consulta
+            fluxos.push({
+                id: `con-${consulta.id}`,
+                Descricao: `Atendimento: ${nome}`,
+                Valor: String(consulta.Valor_da_Consulta),
+                Tipo: 'Entrada',
+                Especialista: consulta.Especialista,
+                Data: consulta.Data_do_Atendimento
+            })
+        }
+
+        // Retorna a lista completa de fluxos
+        res.json(fluxos)
+    } catch (error) {
+        console.error("Erro na rota /Fluxo_de_caixa:", error)
+        res.status(500).json({ error: "Erro no servidor" })
+    }
 })
+
 
 // Rota Editar = app.put
 
