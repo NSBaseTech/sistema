@@ -313,11 +313,11 @@ app.get("/Fluxo_de_caixa", async (req, res) => {
                         where: { id: consulta.Nome }
                     })
 
-                    // Se encontrou o paciente, coloca no cache, senão armazena null
+                    // Armazenar o resultado no cache (mesmo que seja null)
                     pacietesCache[consulta.Nome] = pac || null
                 }
 
-                // Se o paciente existe no cache, define o nome
+                // Verificar se há um paciente no cache antes de acessar 'Nome'
                 if (pacietesCache[consulta.Nome]) {
                     nome = pacietesCache[consulta.Nome].Nome ?? 'Não encontrado'
                 }
@@ -341,6 +341,7 @@ app.get("/Fluxo_de_caixa", async (req, res) => {
         res.status(500).json({ error: "Erro no servidor" })
     }
 })
+
 
 
 // Rota Editar = app.put
