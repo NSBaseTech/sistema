@@ -165,7 +165,7 @@ async function carregarLista(force) {
                 observacaoinp.value = arg.observacao
                 id_agendamento.value = arg.id
 
-                document.getElementById("formagendamento").dataset.agendamentoId = arg.id
+                document.getElementById("formagendamento").dataset.agendamentoid = arg.id
             }
 
         }
@@ -236,6 +236,7 @@ const generateCalendar = async (month, year) => {
             day.onclick = (() => {
                 console.log(nDay)
                 const calendarCurrentDate = new Date(`${year}-${month + 1}-${nDay}`)
+                calendarCurrentDate.setHours(calendarCurrentDate.getHours() + 3)
                 newCurrentDay = calendarCurrentDate;
                 generateCalendar(month, year)
             })
@@ -414,7 +415,7 @@ document.getElementById('agendamento').addEventListener('click', () => {
         nameinp.innerHTML += `<option value="${item.id}">${item.Nome}</option>`
     })
 
-    document.getElementById("formagendamento").dataset.agendamentoId = "0";
+    document.getElementById("formagendamento").dataset.agendamentoid = "0";
     nameinp.value = "" // A escrita antes do : tem que ta igual ao campo que foi criado no prisma
     phoneinp.value = ""
     data_atendimentoinp.value = ""
@@ -506,7 +507,7 @@ function agendamento(event) {
     
 
     const form = document.getElementById("formagendamento");
-    const { agendamentoId } = form.dataset;
+    const { agendamentoid: agendamentoId } = form.dataset;
 
     const inputs = {
         nome: nameinp.value,
@@ -600,6 +601,7 @@ const createAppointment = (data) => {
                 return response.json();
             })
             .then(existingAppointments => {
+                console.log(existingAppointments, data, agendamentoId)
                 // Verifica se há conflitos considerando o agendamento atual
                 const conflict = existingAppointments.some(appt => {
                     // Ignora o próprio agendamento ao verificar conflitos
@@ -645,6 +647,8 @@ const createAppointment = (data) => {
         observacao: inputs.observacao
     };
 
+    console.log(agendamentoId)
+
     if (agendamentoId === '0') {
         const datasFuturasProgramadas = calculadata();
 
@@ -660,6 +664,7 @@ const createAppointment = (data) => {
 
         checkForConflicts(appointmentData, createAppointment);
     } else {
+        console.log(agendamentoId)
         const updatedData = { id: agendamentoId, ...appointmentData };
         checkForConflicts(updatedData, updateAppointment, agendamentoId);
     }
@@ -833,13 +838,13 @@ function loadConsultas(event) {
 
 function insertItemCancelado(item, index) {
     let tr = document.createElement("tr");
-    
+
     // Converte a data de atendimento para o formato UTC
     const date = new Date(item.Data_do_Atendimento);
-    
+
     // Ajuste de fuso horário manual
     const adjustedDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-    
+
     // Formata a data para o formato brasileiro (DD/MM/AAAA)
     const dataFormatada = adjustedDate.toLocaleDateString("pt-BR", {
         day: '2-digit',
@@ -849,18 +854,83 @@ function insertItemCancelado(item, index) {
 
     tr.innerHTML = `
       <td><input type="checkbox"></td>
-      <td id="${item.id}">${item.Nome}</td>
+      <td id="${item.agendamentoId}">${item.Nome}</td>
       <td>${dataFormatada}</td>
       <td>${item.Horario_da_consulta}</td>
       <td>${item.Horario_de_Termino_da_consulta}</td>
       <td>${item.Status_da_Consulta}</td>
       <td>${item.Status_do_pagamento}</td>
-      <td class="columnAction">
-        </td>
+     <td class="columnAction">
+        <button type="button" onclick='showModal(${JSON.stringify(item)})'>
+          <i class="bi bi-pencil"></i>
+        </button>
+      </td>
     `;
 
     tbodyCancelado.appendChild(tr);
 }
+
+
+function showModal(item) {
+
+    document.getElementById("formagendamento").dataset.agendamentoid = item.id
+
+    // Preencher o modal com as informações do item
+    const selectPaciente = document.getElementById('age_name');
+    const option = document.createElement('option');
+    option.value = item.Nome;
+    option.text = item.Nome;
+
+    // Limpar opções existentes e adicionar a opção do paciente
+    selectPaciente.innerHTML = '';
+    selectPaciente.add(option);
+    selectPaciente.value = item.Nome; // Selecionar a opção correta
+
+    document.getElementById('phone').value = item.Telefone;
+    document.getElementById('data_atendimento').value = item.Data_do_Atendimento;
+    document.getElementById('horario_consulta').value = item.Horario_da_consulta;
+    document.getElementById('horariot_consulta').value = item.Horario_de_Termino_da_consulta; // Testar valor fixo
+    document.getElementById('valor_consulta').value = item.Valor_da_Consulta;
+    document.getElementById('status_pagamento').value = item.Status_do_pagamento;
+    document.getElementById('status_c').value = item.Status_da_Consulta;
+    document.getElementById('observacao').value = item.observacao;
+    document.getElementById('id_agendamento').value = item.id;
+
+    // Exibir o modal
+    document.getElementById('mod-agen').showModal();
+
+    const updateAppointment = (data) => {
+        // Verifica se o status da consulta é "Cancelado" e o status do pagamento é "Pago"
+        if (data.Status_da_Consulta === "Cancelado" && data.Status_do_pagamento === "Pago") {
+            alert("Altere o Status do pagamento para 'Pendente' ou 'Cancelado' antes de atualizar.");
+            return; // Interrompe a execução se as condições forem atendidas
+        }
+
+        // Prossegue com a atualização do agendamento se as condições não forem atendidas
+        fetch("/agendamento", {
+            method: "PUT",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert("Paciente Atualizado com sucesso!");
+                carregarLista(true).catch(console.error);
+
+            })
+
+            .catch(() => alert("Erro ao atualizar"));
+    };
+
+
+}
+
+// Adicione um evento de fechamento para o botão "FECHAR"
+document.getElementById('btn-close').addEventListener('click', function () {
+    document.getElementById('mod-agen').close();
+});
 
 
 
@@ -974,7 +1044,7 @@ const draggable = document.getElementById('draggable-container');
 let isDraggable = true;
 let mouseDown = false;
 
-draggable.onmousedown = function(event) {
+draggable.onmousedown = function (event){
    if (!isDraggable) return;
 
    mouseDown = true;
@@ -996,7 +1066,7 @@ draggable.onmousedown = function(event) {
 
    document.addEventListener('mousemove', onMouseMove);
 
-   draggable.onmouseup = function() {
+   draggable.onmouseup = function () {
        mouseDown = false;
        document.removeEventListener('mousemove', onMouseMove);
    };
