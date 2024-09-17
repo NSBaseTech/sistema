@@ -860,11 +860,7 @@ function insertItemCancelado(item, index) {
       <td>${item.Horario_de_Termino_da_consulta}</td>
       <td>${item.Status_da_Consulta}</td>
       <td>${item.Status_do_pagamento}</td>
-    //  <td class="columnAction">
-    //     <button type="button" onclick='showModal(${JSON.stringify(item)})'>
-    //       <i class="bi bi-pencil"></i>
-    //     </button>
-    //   </td>
+     
     `;
 
     tbodyCancelado.appendChild(tr);
