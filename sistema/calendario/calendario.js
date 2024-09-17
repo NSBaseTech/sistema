@@ -860,72 +860,72 @@ function insertItemCancelado(item, index) {
       <td>${item.Horario_de_Termino_da_consulta}</td>
       <td>${item.Status_da_Consulta}</td>
       <td>${item.Status_do_pagamento}</td>
-     <td class="columnAction">
-        <button type="button" onclick='showModal(${JSON.stringify(item)})'>
-          <i class="bi bi-pencil"></i>
-        </button>
-      </td>
+    //  <td class="columnAction">
+    //     <button type="button" onclick='showModal(${JSON.stringify(item)})'>
+    //       <i class="bi bi-pencil"></i>
+    //     </button>
+    //   </td>
     `;
 
     tbodyCancelado.appendChild(tr);
 }
 
 
-function showModal(item) {
+// function showModal(item) {
 
-    document.getElementById("formagendamento").dataset.agendamentoid = item.id
+//     document.getElementById("formagendamento").dataset.agendamentoid = item.id
 
-    // Preencher o modal com as informações do item
-    const selectPaciente = document.getElementById('age_name');
-    const option = document.createElement('option');
-    option.value = item.Nome;
-    option.text = item.Nome;
+//     // Preencher o modal com as informações do item
+//     const selectPaciente = document.getElementById('age_name');
+//     const option = document.createElement('option');
+//     option.value = item.Nome;
+//     option.text = item.Nome;
 
-    // Limpar opções existentes e adicionar a opção do paciente
-    selectPaciente.innerHTML = '';
-    selectPaciente.add(option);
-    selectPaciente.value = item.Nome; // Selecionar a opção correta
+//     // Limpar opções existentes e adicionar a opção do paciente
+//     selectPaciente.innerHTML = '';
+//     selectPaciente.add(option);
+//     selectPaciente.value = item.Nome; // Selecionar a opção correta
 
-    document.getElementById('phone').value = item.Telefone;
-    document.getElementById('data_atendimento').value = item.Data_do_Atendimento;
-    document.getElementById('horario_consulta').value = item.Horario_da_consulta;
-    document.getElementById('horariot_consulta').value = item.Horario_de_Termino_da_consulta; // Testar valor fixo
-    document.getElementById('valor_consulta').value = item.Valor_da_Consulta;
-    document.getElementById('status_pagamento').value = item.Status_do_pagamento;
-    document.getElementById('status_c').value = item.Status_da_Consulta;
-    document.getElementById('observacao').value = item.observacao;
-    document.getElementById('id_agendamento').value = item.id;
+//     document.getElementById('phone').value = item.Telefone;
+//     document.getElementById('data_atendimento').value = item.Data_do_Atendimento;
+//     document.getElementById('horario_consulta').value = item.Horario_da_consulta;
+//     document.getElementById('horariot_consulta').value = item.Horario_de_Termino_da_consulta; // Testar valor fixo
+//     document.getElementById('valor_consulta').value = item.Valor_da_Consulta;
+//     document.getElementById('status_pagamento').value = item.Status_do_pagamento;
+//     document.getElementById('status_c').value = item.Status_da_Consulta;
+//     document.getElementById('observacao').value = item.observacao;
+//     document.getElementById('id_agendamento').value = item.id;
 
-    // Exibir o modal
-    document.getElementById('mod-agen').showModal();
+//     // Exibir o modal
+//     document.getElementById('mod-agen').showModal();
 
-    const updateAppointment = (data) => {
-        // Verifica se o status da consulta é "Cancelado" e o status do pagamento é "Pago"
-        if (data.Status_da_Consulta === "Cancelado" && data.Status_do_pagamento === "Pago") {
-            alert("Altere o Status do pagamento para 'Pendente' ou 'Cancelado' antes de atualizar.");
-            return; // Interrompe a execução se as condições forem atendidas
-        }
+//     const updateAppointment = (data) => {
+//         // Verifica se o status da consulta é "Cancelado" e o status do pagamento é "Pago"
+//         if (data.Status_da_Consulta === "Cancelado" && data.Status_do_pagamento === "Pago") {
+//             alert("Altere o Status do pagamento para 'Pendente' ou 'Cancelado' antes de atualizar.");
+//             return; // Interrompe a execução se as condições forem atendidas
+//         }
 
-        // Prossegue com a atualização do agendamento se as condições não forem atendidas
-        fetch("/agendamento", {
-            method: "PUT",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                alert("Paciente Atualizado com sucesso!");
-                carregarLista(true).catch(console.error);
+//         // Prossegue com a atualização do agendamento se as condições não forem atendidas
+//         fetch("/agendamento", {
+//             method: "PUT",
+//             body: JSON.stringify(data),
+//             headers: {
+//                 "Content-Type": "application/json"
+//             }
+//         })
+//             .then(response => response.json())
+//             .then(data => {
+//                 alert("Paciente Atualizado com sucesso!");
+//                 carregarLista(true).catch(console.error);
 
-            })
+//             })
 
-            .catch(() => alert("Erro ao atualizar"));
-    };
+//             .catch(() => alert("Erro ao atualizar"));
+//     };
 
 
-}
+// }
 
 // Adicione um evento de fechamento para o botão "FECHAR"
 document.getElementById('btn-close').addEventListener('click', function () {
