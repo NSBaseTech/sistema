@@ -292,7 +292,6 @@ app.post("/Fluxo_de_caixa", async (req, res) => {
 app.get("/Fluxo_de_caixa", async (req, res) => {
     const fluxos = await prisma.Fluxo_de_caixa.findMany()
 
-
     const consultas = await prisma.Agendamento.findMany({
         where: {
             Status_do_pagamento: 'Pago',
@@ -302,17 +301,25 @@ app.get("/Fluxo_de_caixa", async (req, res) => {
     const pacietesCache = {}
 
     for (const consulta of consultas) {
-        let nome = ''
+        let nome = 'Não encontrado' // Valor padrão
 
         if (!pacietesCache[consulta.Nome]) {
             const pac = await prisma.cadastro_pacientes.findUnique({
-                where: {id: consulta.Nome}
+                where: { id: consulta.Nome }
             })
 
-            pacietesCache[consulta.Nome] = pac
+            // Verificar se o paciente foi encontrado
+            if (pac) {
+                pacietesCache[consulta.Nome] = pac
+            } else {
+                pacietesCache[consulta.Nome] = null // Evitar repetir consultas ao banco
+            }
         }
 
-        nome = pacietesCache[consulta.Nome].Nome ?? 'Não encontrado'
+        // Verificar se há paciente no cache
+        if (pacietesCache[consulta.Nome]) {
+            nome = pacietesCache[consulta.Nome].Nome ?? 'Não encontrado'
+        }
 
         fluxos.push({
             id: `con-${consulta.id}`,
@@ -321,12 +328,10 @@ app.get("/Fluxo_de_caixa", async (req, res) => {
             Tipo: 'Entrada',
             Especialista: consulta.Especialista,
             Data: consulta.Data_do_Atendimento
-            
         })
     }
 
     res.json(fluxos)
-
 })
 
 // Rota Editar = app.put
