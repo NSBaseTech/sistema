@@ -21,7 +21,7 @@ btnNew.onclick = (event) => {
   }
 
   const Descricao = descItem.value
-  const Valor = parseInt(amount.value, 10);
+  const Valor = parseFloat(amount.value, 10);
   const Tipo = type.value
   const Data = date.value
 
@@ -201,41 +201,41 @@ const draggable = document.getElementById('draggable-container');
 let isDraggable = true;
 let mouseDown = false;
 
-// draggable.onmousedown = function(event) {
-//     if (!isDraggable) return;
+draggable.onmousedown = function(event) {
+    if (!isDraggable) return;
 
-//     mouseDown = true;
-//     event.preventDefault();
+    mouseDown = true;
+    event.preventDefault();
     
-//     let shiftX = event.clientX - draggable.getBoundingClientRect().left;
-//     let shiftY = event.clientY - draggable.getBoundingClientRect().top;
+    let shiftX = event.clientX - draggable.getBoundingClientRect().left;
+    let shiftY = event.clientY - draggable.getBoundingClientRect().top;
 
-//     function moveAt(pageX, pageY) {
-//         draggable.style.left = pageX - shiftX + 'px';
-//         draggable.style.top = pageY - shiftY + 'px';
-//     }
+    function moveAt(pageX, pageY) {
+        draggable.style.left = pageX - shiftX + 'px';
+        draggable.style.top = pageY - shiftY + 'px';
+    }
 
-//     function onMouseMove(event) {
-//         if (mouseDown) {
-//             moveAt(event.pageX, event.pageY);
-//         }
-//     }
+    function onMouseMove(event) {
+        if (mouseDown) {
+            moveAt(event.pageX, event.pageY);
+        }
+    }
 
-//     document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mousemove', onMouseMove);
 
-//     draggable.onmouseup = function() {
-//         mouseDown = false;
-//         document.removeEventListener('mousemove', onMouseMove);
-//     };
-// };
+    draggable.onmouseup = function() {
+        mouseDown = false;
+        document.removeEventListener('mousemove', onMouseMove);
+    };
+};
 
-// draggable.ondragstart = function() {
-//     return false;
-// };
+draggable.ondragstart = function() {
+    return false;
+};
 
-// document.addEventListener('click', function(event) {
-//     isDraggable = !isDraggable;
-//     draggable.style.cursor = isDraggable ? 'move' : 'default';
-// });
+document.addEventListener('click', function(event) {
+    isDraggable = !isDraggable;
+    draggable.style.cursor = isDraggable ? 'move' : 'default';
+});
 
 

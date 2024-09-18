@@ -497,6 +497,19 @@ document.getElementById('mostrarSubform').addEventListener('change', function ()
     subform.style.display = this.checked ? 'block' : 'none';
 });
 
+document.getElementById('valor_consulta').addEventListener('input', function() {
+    let valor = this.value.replace(/\D/g, ''); // Remove tudo que não é número
+
+    if (valor.length > 0) {
+        // Divide o valor por 100 para adicionar os centavos
+        valor = (parseFloat(valor) / 100).toFixed(2);
+    }
+
+    // Atualiza o campo com o valor formatado como número (sem "R$")
+    this.value = valor;
+});
+
+
 function converterDataFormatoBrasileiroParaISO(data) {
     var partes = data.split("/");
     return partes[2] + "-" + partes[1] + "-" + partes[0];
