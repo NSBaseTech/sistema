@@ -867,7 +867,7 @@ function insertItemCancelado(item, index) {
 
     tr.innerHTML = `
       <td><input type="checkbox"></td>
-      <td id="${item.agendamentoId}">${item.Nome}</td>
+      <td id="${item.id}">${item.Nome}</td>
       <td>${dataFormatada}</td>
       <td>${item.Horario_da_consulta}</td>
       <td>${item.Horario_de_Termino_da_consulta}</td>
