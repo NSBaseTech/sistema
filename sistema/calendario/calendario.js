@@ -864,81 +864,135 @@ function insertItemCancelado(item, index) {
         month: '2-digit',
         year: 'numeric'
     });
+    
+        
 
     tr.innerHTML = `
       <td><input type="checkbox"></td>
+
       <td id="${item.id}">${item.Nome}</td>
       <td>${dataFormatada}</td>
       <td>${item.Horario_da_consulta}</td>
       <td>${item.Horario_de_Termino_da_consulta}</td>
       <td>${item.Status_da_Consulta}</td>
       <td>${item.Status_do_pagamento}</td>
-     
+     <td class="columnAction">
+        <button type="button" onclick='showModal(${JSON.stringify(item,index)})'>
+          <i class="bi bi-pencil"></i>
+        </button>
+        
+      </td>
     `;
 
     tbodyCancelado.appendChild(tr);
+   
 }
 
 
-// function showModal(item) {
+function showModal(item) {  
+    // Define o ID do agendamento no dataset do formulário
+    document.getElementById("formagendamento").dataset.agendamentoid = item.id;
+    console.log("ID do agendamento:", item.id);
+    
+    // Preencher o modal com as informações do item
+    const selectPaciente = document.getElementById('age_name');
+    
+    // Limpar opções existentes
+    selectPaciente.innerHTML = '';
 
-//     document.getElementById("formagendamento").dataset.agendamentoid = item.id
+    // Buscar o paciente pelo nome para obter o ID
+    const paciente = todosPacientes.find(({ Nome }) => Nome === item.Nome);
 
-//     // Preencher o modal com as informações do item
-//     const selectPaciente = document.getElementById('age_name');
-//     const option = document.createElement('option');
-//     option.value = item.Nome;
-//     option.text = item.Nome;
+    if (paciente) {
+        // Criar e adicionar a opção do paciente com ID como valor
+        const option = document.createElement('option');
+        option.value = paciente.id; // Usar o ID como valor
+        option.text = paciente.Nome; // Exibir o nome do paciente
+        selectPaciente.add(option);
 
-//     // Limpar opções existentes e adicionar a opção do paciente
-//     selectPaciente.innerHTML = '';
-//     selectPaciente.add(option);
-//     selectPaciente.value = item.Nome; // Selecionar a opção correta
+        // Selecionar a opção correta
+        selectPaciente.value = paciente.id; // Selecionar pelo ID
 
-//     document.getElementById('phone').value = item.Telefone;
-//     document.getElementById('data_atendimento').value = item.Data_do_Atendimento;
-//     document.getElementById('horario_consulta').value = item.Horario_da_consulta;
-//     document.getElementById('horariot_consulta').value = item.Horario_de_Termino_da_consulta; // Testar valor fixo
-//     document.getElementById('valor_consulta').value = item.Valor_da_Consulta;
-//     document.getElementById('status_pagamento').value = item.Status_do_pagamento;
-//     document.getElementById('status_c').value = item.Status_da_Consulta;
-//     document.getElementById('observacao').value = item.observacao;
-//     document.getElementById('id_agendamento').value = item.id;
+        // Adicionar evento change para atualizar o modal e enviar dados ao servidor
+        selectPaciente.addEventListener('change', function () {
+            const agendamentoId = document.getElementById("formagendamento").dataset.agendamentoid;
+            const pacienteId = selectPaciente.value; // ID do paciente selecionado
 
-//     // Exibir o modal
-//     document.getElementById('mod-agen').showModal();
+            // Atualizar os campos do modal
+            document.getElementById('modalAgendamentoId').textContent = `Agendamento ID: ${agendamentoId}`;
+            document.getElementById('modalPacienteId').textContent = `Paciente ID: ${pacienteId}`;
 
-//     const updateAppointment = (data) => {
-//         // Verifica se o status da consulta é "Cancelado" e o status do pagamento é "Pago"
-//         if (data.Status_da_Consulta === "Cancelado" && data.Status_do_pagamento === "Pago") {
-//             alert("Altere o Status do pagamento para 'Pendente' ou 'Cancelado' antes de atualizar.");
-//             return; // Interrompe a execução se as condições forem atendidas
-//         }
+            // Enviar dados para o servidor
+            enviarDadosParaServidor(agendamentoId, pacienteId);
+        });
+    }
 
-//         // Prossegue com a atualização do agendamento se as condições não forem atendidas
-//         fetch("/agendamento", {
-//             method: "PUT",
-//             body: JSON.stringify(data),
-//             headers: {
-//                 "Content-Type": "application/json"
-//             }
-//         })
-//             .then(response => response.json())
-//             .then(data => {
-//                 alert("Paciente Atualizado com sucesso!");
-//                 carregarLista(true).catch(console.error);
+    // Preencher os outros campos do modal
+    document.getElementById('phone').value = item.Telefone;
+    document.getElementById('data_atendimento').value = item.Data_do_Atendimento;
+    document.getElementById('horario_consulta').value = item.Horario_da_consulta;
+    document.getElementById('horariot_consulta').value = item.Horario_de_Termino_da_consulta; // Testar valor fixo
+    document.getElementById('valor_consulta').value = item.Valor_da_Consulta;
+    document.getElementById('status_pagamento').value = item.Status_do_pagamento;
+    document.getElementById('status_c').value = item.Status_da_Consulta;
+    document.getElementById('observacao').value = item.observacao;
 
-//             })
+    // Adicione a linha para definir o ID do agendamento
+    document.getElementById('id_agendamento').value = item.id;
 
-//             .catch(() => alert("Erro ao atualizar"));
-//     };
+    // Exibir o modal
+    document.getElementById('mod-agen').showModal();
+
+    // Função para enviar dados para o servidor
+    function enviarDadosParaServidor(agendamentoId, pacienteId) {
+        const data = {
+            id: agendamentoId,
+            PacienteId: pacienteId,
+            Telefone: document.getElementById('phone').value,
+            Data_do_Atendimento: document.getElementById('data_atendimento').value,
+            Horario_da_consulta: document.getElementById('horario_consulta').value,
+            Horario_de_Termino_da_consulta: document.getElementById('horariot_consulta').value,
+            Valor_da_Consulta: document.getElementById('valor_consulta').value,
+            Status_do_pagamento: document.getElementById('status_pagamento').value,
+            Status_da_Consulta: document.getElementById('status_c').value,
+            observacao: document.getElementById('observacao').value
+        };
+
+        // Verifica se o status da consulta é "Cancelado" e o status do pagamento é "Pago"
+        if (data.Status_da_Consulta === "Cancelado" && data.Status_do_pagamento === "Pago") {
+            alert("Altere o Status do pagamento para 'Pendente' ou 'Cancelado' antes de atualizar.");
+            return; // Interrompe a execução se as condições forem atendidas
+        }
+
+        // Prossegue com a atualização do agendamento
+        fetch("/agendamento", {
+            method: "PUT",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert("Paciente Atualizado com sucesso!");
+            carregarLista(true).catch(console.error);
+            
+                        
+        })
+       
+        .catch(() => alert("Erro ao atualizar"));
+        
+    }
+    
+}
 
 
-// }
 
 // Adicione um evento de fechamento para o botão "FECHAR"
 document.getElementById('btn-close').addEventListener('click', function () {
     document.getElementById('mod-agen').close();
+    loadConsultas(new Event('submit')); // Recarregar a lista
+   
 });
 
 
@@ -981,6 +1035,7 @@ function deleteSelectedRows(event) {
             alert("Altere o Status do pagamento para 'Pendente' ou 'Cancelado'.");
         } else {
             deleteItemInDB(event, idDoElemento);
+            alert("Agendamento cancelado com sucesso!");
         }
     });
 }
@@ -1084,4 +1139,5 @@ draggable.onmousedown = function (event){
 document.getElementById("open-chat-btn1").addEventListener("click", () => {
     window.location.href = '../chat/chat.html'
  })
+ 
  
